@@ -4,7 +4,7 @@
     <div class="login_box">
       <!-- 登陆头像 -->
       <div class="avatar_box">
-        <img src="../assets/logo.png" alt />
+        <img src="../assets/225822.png" alt />
       </div>
       <!-- 登陆表单区域 -->
       <el-form
@@ -44,8 +44,8 @@ export default {
   data() {
     return {
       fromdata: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       rules: {
         username: [
