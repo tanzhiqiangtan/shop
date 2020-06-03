@@ -59,7 +59,12 @@
               size="mini"
             ></el-button>
             <el-tooltip class="item" effect="dark" content="分配角色" placement="top">
-              <el-button type="warning" icon="el-icon-s-tools" size="mini"></el-button>
+              <el-button
+                @click="showRole(scope.row)"
+                type="warning"
+                icon="el-icon-s-tools"
+                size="mini"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -132,6 +137,26 @@
         <el-button type="primary" @click="Edituser">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- // 展示角色弹出框 -->
+    <el-dialog @close="roleSelect=''" title="提示" :visible.sync="showRoleVisible" width="50%">
+      <p>当前用户：{{userinfo.username}}</p>
+      <p>当前角色：{{userinfo.role_name}}</p>
+      <p>
+        分配新角色：
+        <el-select v-model="roleSelect" slot="prepend" placeholder="请选择角色">
+          <el-option
+            :key="item.id"
+            v-for="item in rolesList"
+            :label="item.roleName"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </p>
+      <span slot="footer">
+        <el-button @click="showRoleVisible = false">取 消</el-button>
+        <el-button type="primary" @click="chooseRole">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -163,12 +188,18 @@ export default {
       // 用户列表的数据
       total: 0,
       usersList: [],
+      rolesList: [],
       // 用过id查询的数据
       edituser: {},
+      // 角色选择
+      roleSelect: '',
       // 控制是否打开新增对话框的数据
       dialogVisible: false,
       // 控制是否打开修改用户对话框的数据
       EditUserVisible: false,
+      showRoleVisible: false,
+      // 当前分配权限的用户信息
+      userinfo: '',
       // 新增用户的表单数据
       AddUserformData: {
         username: '',
@@ -210,7 +241,7 @@ export default {
       if (ret.meta.status !== 200) {
         return this.$message.error('请求用户列表数据失败')
       }
-      console.log(ret)
+      // console.log(ret)
       this.total = ret.data.total
       console.log(ret.data.users)
       this.usersList = ret.data.users
@@ -268,7 +299,9 @@ export default {
       this.EditUserVisible = true
       console.log(id)
       const { data: ret } = await this.$http.get(`users/${id}`)
-      if (ret.meta.status !== 200) { return this.$message.error('获取当前用户数据失败') }
+      if (ret.meta.status !== 200) {
+        return this.$message.error('获取当前用户数据失败')
+      }
       this.edituser = ret.data
     },
     // 修改用户信息
@@ -281,7 +314,9 @@ export default {
           { email: this.edituser.email, mobile: this.edituser.mobile }
         )
         console.log(ret)
-        if (ret.meta.status !== 200) { return this.$message.error('修改当前用户数据失败') }
+        if (ret.meta.status !== 200) {
+          return this.$message.error('修改当前用户数据失败')
+        }
         this.$message.success('修改当前用户数据成功')
         this.getUserList()
       })
@@ -314,12 +349,13 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then((value) => {
-        console.log(value)
+      })
+        .then(value => {
+          console.log(value)
 
-        return this.$http.delete(`users/${id}`)
-      }).then(
-        value => {
+          return this.$http.delete(`users/${id}`)
+        })
+        .then(value => {
           if (value.data.meta.status !== 200) {
             return this.$message({
               type: 'error',
@@ -333,21 +369,46 @@ export default {
           // 删除的bug
           // console.log(this.total)
           // console.log(this.queryInfo.pagesize)
-          const yushu = (this.total) % (this.queryInfo.pagesize)
+          const yushu = this.total % this.queryInfo.pagesize
           // console.log(yushu)
-          this.queryInfo.pagenum = yushu === 1 ? this.queryInfo.pagenum - 1 : this.queryInfo.pagenum
+          this.queryInfo.pagenum =
+            yushu === 1 ? this.queryInfo.pagenum - 1 : this.queryInfo.pagenum
           // console.log(this.queryInfo.pagenum)
           // 最后更新用户列
           this.getUserList()
-        }
-      )
-        .catch((reason) => {
+        })
+        .catch(reason => {
           console.log(reason)
           this.$message({
             type: 'info',
             message: '已取消删除'
           })
         })
+    },
+    // 展示角色
+    async showRole(userinfo) {
+      this.showRoleVisible = true
+      this.userinfo = userinfo
+      const { data: ret } = await this.$http.get('roles')
+      if (ret.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败')
+      }
+      this.rolesList = ret.data
+    },
+    // 选择角色
+    async chooseRole() {
+      if (!this.roleSelect) return this.$message.error('请选择新的角色')
+      const { data: ret } = await this.$http.put(
+        `users/${this.userinfo.id}/role`,
+        {
+          rid: this.roleSelect
+        }
+      )
+      // console.log(ret)
+      if (ret.meta.status !== 200) return this.$message.error('角色设置失败')
+      this.$message.success('角色设置成功')
+      this.showRoleVisible = false
+      this.getUserList()
     }
   }
 }
