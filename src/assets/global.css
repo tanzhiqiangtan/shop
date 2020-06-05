@@ -8,4 +8,7 @@ html,body,#app {
 ::-webkit-scrollbar {
   /*隐藏滚轮*/
   display: none;
-  }
+}
+.el-scrollbar__wrap {
+  height: 300px !important;
+}
