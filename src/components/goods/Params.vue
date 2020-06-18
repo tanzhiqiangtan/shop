@@ -26,7 +26,7 @@
       <!-- Tabs 框内容 -->
       <el-tabs @tab-click="getParamsById" v-model="activeName">
         <!-- 动态参数 -->
-        <el-tab-pane label="动态参数" name="only">
+        <el-tab-pane label="动态参数" name="many">
           <!-- 添加按钮 -->
           <el-row>
             <el-button @click="showAddParams" :disabled="BtnValid" size="mini" type="primary">添加参数</el-button>
@@ -82,7 +82,7 @@
           </el-table>
         </el-tab-pane>
         <!-- 静态参数 -->
-        <el-tab-pane label="静态参数" name="many">
+        <el-tab-pane label="静态属性" name="only">
           <el-row>
             <el-button @click="showAddParams" :disabled="BtnValid" size="mini" type="primary">添加属性</el-button>
           </el-row>
@@ -186,7 +186,7 @@ export default {
       // 级联框选中的分类ID
       selectcateId: [],
       // tab框的值
-      activeName: 'only',
+      activeName: 'many',
       // 三级参数列表
       paramsList: [],
       // 添加参数的diglog框是否显示
@@ -245,6 +245,7 @@ export default {
     },
     // 通过三级id查询参数
     async getParamsById() {
+      // console.log(res)
       if (this.selectcateId.length !== 3) {
         return (this.paramsList = [])
       }
@@ -254,6 +255,7 @@ export default {
         }/attributes`,
         { params: { sel: this.activeName } }
       )
+      console.log(JSON.stringify(res.data))
       if (res.meta.status !== 200) {
         return this.$message.error('获取商品参数失败')
       }

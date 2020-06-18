@@ -12,9 +12,9 @@ html,body,#app {
 .el-scrollbar__wrap {
   height: 300px !important;
 }
-.el-table__body {
-  width: 100% !important
+.el-step__title {
+  font-size: 12px;
 }
-.el-table__header {
-  width: 100% !important
+.ql-container {
+  min-height: 300px;
 }

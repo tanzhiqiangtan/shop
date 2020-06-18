@@ -13,14 +13,17 @@
         <el-button type="primary" @click="showaddCateDialog">添加分类</el-button>
       </el-row>
       <!-- 分类的表格区域 -->
+      <!-- ref="treeRef" -->
+        <!-- @checkbox-click="getArry" -->
+        <!-- :selection-type="true" -->
       <tree-table
+        :selection-type="false"
         border
         class="tree-table"
         index-text="#"
         show-index
         :data="cataList"
         :columns="columns"
-        :selection-type="false"
         :expand-type="false"
       >
         <template slot="isvalid" slot-scope="scope">
@@ -299,6 +302,10 @@ export default {
           })
         })
     }
+    // test
+    // getArry() {
+    //   console.log(this.$refs.treeRef.getCheckedProp('cat_id'))
+    // }
   }
 }
 </script>
